@@ -19,48 +19,45 @@ class Request
         return htmlspecialchars(stripslashes(trim($input)));
     }
 
-    function body(string $key = "")
+    function body(string $key = "", string $default = "")
     {
-        // if key set and not empty return key value
-        if (isset($key) && !empty($key)) {
-            if (isset($this->body_data[$key]) && !empty($this->body_data[$key])) {
-                return $this->clean_input($this->body_data[$key]);
-            } else {
-                return null;
-            }
-        } else {
-            // return all body data
+        // if key not set and empty return all body data
+        if (!isset($key) || empty($key)) {
             return $this->body_data;
         }
+
+        if (isset($this->body_data[$key]) && !empty($this->body_data[$key])) {
+            return $this->clean_input($this->body_data[$key]);
+        }
+
+        return $default;
     }
 
-    function query(string $key = "")
+    function query(string $key = "", string $default = "")
     {
-        // if key set and not empty return key value
-        if (isset($key) && !empty($key)) {
-            if (isset($this->query_data[$key]) && !empty($this->query_data[$key])) {
-                return $this->clean_input($this->query_data[$key]);
-            } else {
-                return null;
-            }
-        } else {
-            // return all query data
+        // if key not set and empty return all query data
+        if (!isset($key) || empty($key)) {
             return $this->query_data;
         }
+
+        if (isset($this->query_data[$key]) && !empty($this->query_data[$key])) {
+            return $this->clean_input($this->query_data[$key]);
+        }
+
+        return $default;
     }
 
-    function params(string $key = "")
+    function params(string $key = "", string $default = "")
     {
-        // if key set and not empty return key value
-        if (isset($key) && !empty($key)) {
-            if (isset($this->params_data[$key]) && !empty($this->params_data[$key])) {
-                return $this->clean_input($this->params_data[$key]);
-            } else {
-                return null;
-            }
-        } else {
-            // return all query data
+        // if key not set and empty return all query data
+        if (!isset($key) || empty($key)) {
             return $this->params_data;
         }
+
+        if (isset($this->params_data[$key]) && !empty($this->params_data[$key])) {
+            return $this->clean_input($this->params_data[$key]);
+        }
+
+        return $default;
     }
 }
