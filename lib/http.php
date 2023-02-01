@@ -1,6 +1,8 @@
 <?php
 
 require(__DIR__ . "/Uri.php");
+require(__DIR__ . "/request.php");
+require(__DIR__ . "/response.php");
 
 class HttpPhp
 {
@@ -163,7 +165,12 @@ class HttpPhp
         // check handler
         if (!is_callable($handler))
             throw new \Exception("handler is not callable");
-        $handler($this);
+
+        $request = new Request($this->params);
+        $response = new Response();
+
+        // execute the handler function
+        $handler($response, $request);
         // exit();
     }
 
@@ -192,7 +199,7 @@ class HttpPhp
             // check handler
             if (!is_callable($handler[$i]))
                 throw new \Exception("handler is not callable");
-            $handler[$i]("ID => ".$i);
+            $handler[$i]("ID => " . $i);
         }
         echo "Handler len is " . count($handler) . " \n";
 
@@ -200,8 +207,8 @@ class HttpPhp
         // $request_uri = ltrim(Uri::cleaner($this->request_uri), $currentPath);
         $request_url = $this->getRequestData("url");
         $request_method = $this->getRequestData("method");
-        $request_uri = "/".Uri::cleaner(ltrim(Uri::cleaner($this->getRequestData("uri")), $path));
-        $previous_path = "/".Uri::cleaner(Uri::cleaner($this->getConfig("previous_path") ?? "/") . "/" . Uri::cleaner($path));
+        $request_uri = "/" . Uri::cleaner(ltrim(Uri::cleaner($this->getRequestData("uri")), $path));
+        $previous_path = "/" . Uri::cleaner(Uri::cleaner($this->getConfig("previous_path") ?? "/") . "/" . Uri::cleaner($path));
         echo "request_url => ", $request_url, "\n";
         echo "request_method => ", $request_method, "\n";
         echo "request_uri => ", $request_uri, "\n";

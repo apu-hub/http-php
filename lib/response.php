@@ -13,6 +13,8 @@ class Response
             http_response_code($response_code);
         else
             http_response_code(200);
+
+        return $this;
     }
 
     function json(array $response)
@@ -24,28 +26,21 @@ class Response
         exit();
     }
 
-    function view(array $templates, array $data = null)
+    function view(array $templates, array $data = [])
     {
-        $content = null;
-
+        extract($data);
         foreach ($templates as $key => $file_path) {
+            $app_root = dirname(dirname(__FILE__));
             // get absulute path
-            $file_path = join(DIRECTORY_SEPARATOR, array($_SERVER['DOCUMENT_ROOT'], $file_path));
-
+            $file_path = join(DIRECTORY_SEPARATOR, array($app_root, $file_path));
             // check is file exists
-            if (file_exists($file_path)) {
-                // fetch content from file
-                // ! error handler
-                $content .= file_get_contents($file_path);
+            if (!file_exists($file_path)) {
+                $message = "View File " . basename($file_path) . " Not Found";
+                throw new \Exception($message);
             }
-        }
 
-        if (gettype($data) != "array") $this->send($content);
-
-        // parse parameter
-        foreach ($data as $key => $value) {
-            $content = str_replace('{{ ' . $key . ' }}', $value, $content);
+            include($file_path);
         }
-        $this->send($content);
+        return $this;
     }
 }
