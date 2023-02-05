@@ -1,6 +1,8 @@
 <?php
 class Response
 {
+    protected string $redirect_url = "";
+    protected Session $session;
     function send(string $message)
     {
         echo $message;
@@ -42,5 +44,25 @@ class Response
             include($file_path);
         }
         return $this;
+    }
+
+    public function back()
+    {
+        $this->redirect_url = $_SERVER['HTTP_REFERER'] ?? "";
+        $this->session = new Session("back");
+        return $this;
+    }
+
+    public function redirect(string $url)
+    {
+        $this->redirect_url = $url;
+        $this->session = new Session("redirect");
+        return $this;
+    }
+
+    public function with(string $key, $value)
+    {
+        $this->session->with($key, $value);
+        Utils::phpRedirect($this->redirect_url);
     }
 }
