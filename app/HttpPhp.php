@@ -148,7 +148,7 @@ class HttpPhp
     /**
      * Get Method
      */
-    public function get(string $path, $handler)
+    public function get(string $path, callable ...$handler)
     {
         echo "\nGET =======>\n";
         // if METHOD and pattern not matched
@@ -164,15 +164,17 @@ class HttpPhp
         $fullPath = Uri::cleaner($this->getConfig("previous_path") ?? "/") . "/" . Uri::cleaner($path);
         $this->params = Uri::parseParamData($this->getRequestData("url"), $fullPath);
 
-        // check handler
-        if (!is_callable($handler))
-            throw new \Exception("handler is not callable");
-
         $request = new Request($this->params);
         $response = new Response();
 
-        // execute the handler function
-        $handler($response, $request);
+        // check handler
+        for ($i = 0; $i < count($handler); $i++) {
+            if (!is_callable($handler[$i]))
+            throw new \Exception("handler is not callable");
+            // execute the handler function
+            $handler[$i]($response, $request);
+        }
+
         exit();
     }
 
