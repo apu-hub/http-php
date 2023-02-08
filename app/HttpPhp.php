@@ -150,16 +150,12 @@ class HttpPhp
      */
     public function get(string $path, callable ...$handler)
     {
-        echo "\nGET =======>\n";
         // if METHOD and pattern not matched
         if ($this->getRequestData("method") !== "GET") return $this;
-        // add previous path
-        $currentPath = Uri::cleaner($path);
+
         // path not matched
-        echo "uri => ", $this->getRequestData("uri"), "\n";
-        echo "path => ", $path, "\n";
         if (!Uri::matchUriAndPath($this->getRequestData("uri"), $path)) return $this;
-        echo "match\n";
+
         // parse param data
         $fullPath = Uri::cleaner($this->getConfig("previous_path") ?? "/") . "/" . Uri::cleaner($path);
         $this->params = Uri::parseParamData($this->getRequestData("url"), $fullPath);
@@ -178,25 +174,17 @@ class HttpPhp
         exit();
     }
 
-    public function check()
-    {
-        echo "aka";
-    }
     /**
      * Group 
      */
     public function group($path, $handler = [])
     {
-        echo "\nGROUP =======>\n";
         // add wildcard to group path
         $currentPath = Uri::cleaner($path);
         $currentPath .= "/*";
+
         // path not matched
-        echo "uri => ", $this->getRequestData("uri"), "\n";
-        echo "path => ", $currentPath, "\n";
         if (!Uri::matchUriAndPath($this->getRequestData("uri"), $currentPath)) return $this;
-        echo "match\n";
-        // if (!Uri::matchUriAndPath($this->request_uri, $path)) return $this;
 
         for ($i = 0; $i < count($handler); $i++) {
             // echo $handler[$i];
@@ -205,18 +193,12 @@ class HttpPhp
                 throw new \Exception("handler is not callable");
             $handler[$i]("ID => " . $i);
         }
-        echo "Handler len is " . count($handler) . " \n";
 
         // remove group path
-        // $request_uri = ltrim(Uri::cleaner($this->request_uri), $currentPath);
         $request_url = $this->getRequestData("url");
         $request_method = $this->getRequestData("method");
         $request_uri = "/" . Uri::cleaner(ltrim(Uri::cleaner($this->getRequestData("uri")), $path));
         $previous_path = "/" . Uri::cleaner(Uri::cleaner($this->getConfig("previous_path") ?? "/") . "/" . Uri::cleaner($path));
-        echo "request_url => ", $request_url, "\n";
-        echo "request_method => ", $request_method, "\n";
-        echo "request_uri => ", $request_uri, "\n";
-        echo "previous_path => ", $previous_path, "\n";
         return new HttpPhp([
             "request_url" => $request_url,
             "request_method" => $request_method,
