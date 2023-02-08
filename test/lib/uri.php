@@ -1,5 +1,6 @@
 <?php
-require(__DIR__ . "/../lib/Uri.php");
+require(__DIR__."/../../vendor/autoload.php");
+use App\Uri;
 
 $start_time = microtime(true);
 // getSegment();

@@ -1,4 +1,7 @@
 <?php
+namespace App;
+use App\Session;
+
 class Response
 {
     protected string $redirect_url = "";

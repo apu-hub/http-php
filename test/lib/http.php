@@ -1,7 +1,6 @@
 <?php
-
-require(__DIR__ . "/../lib/Http.php");
-
+require(__DIR__."/../../vendor/autoload.php");
+use App\HttpPhp;
 
 $requestArray = [
     ["test" => ["url" => "/sample-app", "uri" => "/sample-app", "method" => "GET"]],

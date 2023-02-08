@@ -1,4 +1,6 @@
 <?php
+namespace App;
+
 class Request
 {
     private $body_data = [];

@@ -1,4 +1,5 @@
 <?php
+namespace App;
 // define("wildcardParam",   '*'); // indicates a optional greedy parameter
 // define("paramStarterChar", ':'); // start character for a parameter with name
 class Uri

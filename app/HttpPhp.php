@@ -1,8 +1,8 @@
 <?php
-
-require(__DIR__ . "/Uri.php");
-require(__DIR__ . "/request.php");
-require(__DIR__ . "/response.php");
+namespace App;
+use App\Request;
+use App\Response;
+use App\Uri;
 
 class HttpPhp
 {
@@ -171,7 +171,7 @@ class HttpPhp
 
         // execute the handler function
         $handler($response, $request);
-        // exit();
+        exit();
     }
 
     public function check()
