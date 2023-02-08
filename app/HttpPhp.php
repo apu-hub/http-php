@@ -1,5 +1,7 @@
 <?php
+
 namespace App;
+
 use App\Request;
 use App\Response;
 use App\Uri;
@@ -219,5 +221,34 @@ class HttpPhp
             "request_uri" => $request_uri,
             "previous_path" => $previous_path,
         ]);
+    }
+
+    /**
+     * Router 
+     */
+    public function router(string $path, callable $handler)
+    {
+        // add wildcard to router path
+        $currentPath = Uri::cleaner($path);
+        $currentPath .= "/*";
+        // path not matched
+        if (!Uri::matchUriAndPath($this->getRequestData("uri"), $currentPath)) return $this;
+
+        // check handler
+        if (!is_callable($handler))
+            throw new \Exception("handler is not callable");
+
+        // remove router path
+        $request_url = $this->getRequestData("url");
+        $request_method = $this->getRequestData("method");
+        $request_uri = "/" . Uri::cleaner(ltrim(Uri::cleaner($this->getRequestData("uri")), $path));
+        $previous_path = "/" . Uri::cleaner(Uri::cleaner($this->getConfig("previous_path") ?? "/") . "/" . Uri::cleaner($path));
+        // start new router
+        $handler(new HttpPhp([
+            "request_url" => $request_url,
+            "request_method" => $request_method,
+            "request_uri" => $request_uri,
+            "previous_path" => $previous_path,
+        ]));
     }
 }
