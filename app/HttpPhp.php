@@ -166,7 +166,7 @@ class HttpPhp
         // check handler
         for ($i = 0; $i < count($handler); $i++) {
             if (!is_callable($handler[$i]))
-            throw new \Exception("handler is not callable");
+                throw new \Exception("handler is not callable");
             // execute the handler function
             $handler[$i]($response, $request);
         }
@@ -177,7 +177,7 @@ class HttpPhp
     /**
      * Group 
      */
-    public function group($path, $handler = [])
+    public function group(string $path, callable ...$handler)
     {
         // add wildcard to group path
         $currentPath = Uri::cleaner($path);
@@ -186,12 +186,19 @@ class HttpPhp
         // path not matched
         if (!Uri::matchUriAndPath($this->getRequestData("uri"), $currentPath)) return $this;
 
+        // parse param data
+        $fullPath = Uri::cleaner($this->getConfig("previous_path") ?? "/") . "/" . Uri::cleaner($path);
+        $this->params = Uri::parseParamData($this->getRequestData("url"), $fullPath);
+
+        $request = new Request($this->params);
+        $response = new Response();
+
+        // check handler
         for ($i = 0; $i < count($handler); $i++) {
-            // echo $handler[$i];
-            // check handler
             if (!is_callable($handler[$i]))
                 throw new \Exception("handler is not callable");
-            $handler[$i]("ID => " . $i);
+            // execute the handler function
+            $handler[$i]($response, $request);
         }
 
         // remove group path
