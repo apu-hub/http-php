@@ -41,11 +41,8 @@ class HttpPhp
         // ! ### test ### ! \\
         if ($this->getConfig("test") != null) {
             echo "\nApp Running Under Test Mode...\n\n";
-            // $this->setConfig($this->getConfig("test"));
             $this->setRequestData($this->getConfig("test"));
             echo "================ test \n";
-            // var_dump($this->config);
-            // var_dump($this->requestData);
             echo "url => ", $this->getRequestData("url"), "\n";
             echo "uri => ", $this->getRequestData("uri"), "\n";
             return;
@@ -63,30 +60,10 @@ class HttpPhp
                 "method" => $this->getConfig("request_method"),
                 "uri" => $this->getConfig("request_uri"),
             ]);
-            echo "================ neasted \n";
-            // var_dump($this->config);
-            // var_dump($this->requestData);
-            echo "url => ", $this->getRequestData("url"), "\n";
-            echo "uri => ", $this->getRequestData("uri"), "\n";
             return;
         }
 
         $this->setRequestData();
-        echo "================ defualt \n";
-        // var_dump($this->config);
-        // var_dump($this->requestData);
-        echo "url => ", $this->getRequestData("url"), "\n";
-        echo "uri => ", $this->getRequestData("uri"), "\n";
-
-        // // ! Request URI
-        // if ($this->getConfig('request_uri') != null)
-        //     $this->request_uri = $this->getConfig('request_uri');
-        // else
-        //     $this->request_uri = $_SERVER['REQUEST_URI'];
-
-        // // Previous Path
-        // if ($this->getConfig('previous_path') != null)
-        //     $this->previous_path = $this->getConfig('previous_path') ?? "";
     }
 
     /**
