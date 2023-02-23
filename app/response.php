@@ -33,11 +33,15 @@ class Response
 
     function view(array $templates, array $data = [])
     {
+        $app_root = dirname(__FILE__);
+        $feature_page = join(DIRECTORY_SEPARATOR, [dirname($app_root), "Features"]);
+
         extract($data);
-        foreach ($templates as $key => $file_path) {
-            $app_root = dirname(dirname(__FILE__));
+        foreach ($templates as $key => $view_path) {
+            $temp = explode(".", $view_path);
+            $file_name = $temp[1] . ".view." . $temp[0] . ".php";
+            $file_path = join(DIRECTORY_SEPARATOR, [$feature_page, $temp[0], $file_name]);
             // get absulute path
-            $file_path = join(DIRECTORY_SEPARATOR, array($app_root, $file_path));
             // check is file exists
             if (!file_exists($file_path)) {
                 $message = "View File " . basename($file_path) . " Not Found";
