@@ -1,4 +1,5 @@
 <?php
+
 namespace App;
 // define("wildcardParam",   '*'); // indicates a optional greedy parameter
 // define("paramStarterChar", ':'); // start character for a parameter with name
@@ -106,5 +107,13 @@ class Uri
     public static function getRequestUri(): string
     {
         return $_SERVER['REQUEST_URI'];
+    }
+    public static function getGroupUri(string $uri, string $path)
+    {
+        // clean up
+        $uri = Uri::cleaner($uri);
+        $path = Uri::cleaner($path);
+        // remove leading string
+        return substr($uri, strlen($path));
     }
 }

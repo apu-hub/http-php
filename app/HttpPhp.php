@@ -145,7 +145,11 @@ class HttpPhp
             if (!is_callable($handler[$i]))
                 throw new \Exception("handler is not callable");
             // execute the handler function
-            $handler[$i]($response, $request);
+            $res = $handler[$i]($response, $request);
+            // var_dump($res);
+            if ($res) {
+                exit();
+            }
         }
 
         exit();
@@ -181,7 +185,8 @@ class HttpPhp
         // remove group path
         $request_url = $this->getRequestData("url");
         $request_method = $this->getRequestData("method");
-        $request_uri = "/" . Uri::cleaner(ltrim(Uri::cleaner($this->getRequestData("uri")), $path));
+        // $request_uri = "/" . Uri::cleaner(ltrim(Uri::cleaner($this->getRequestData("uri")), $path));
+        $request_uri = "/" . Uri::cleaner(Uri::getGroupUri($this->getRequestData("uri"), $path));
         $previous_path = "/" . Uri::cleaner(Uri::cleaner($this->getConfig("previous_path") ?? "/") . "/" . Uri::cleaner($path));
         return new HttpPhp([
             "request_url" => $request_url,
@@ -209,7 +214,8 @@ class HttpPhp
         // remove router path
         $request_url = $this->getRequestData("url");
         $request_method = $this->getRequestData("method");
-        $request_uri = "/" . Uri::cleaner(ltrim(Uri::cleaner($this->getRequestData("uri")), $path));
+        // $request_uri = "/" . Uri::cleaner(ltrim(Uri::cleaner($this->getRequestData("uri")), $path));
+        $request_uri = "/" . Uri::cleaner(Uri::getGroupUri($this->getRequestData("uri"), $path));
         $previous_path = "/" . Uri::cleaner(Uri::cleaner($this->getConfig("previous_path") ?? "/") . "/" . Uri::cleaner($path));
         // start new router
         $handler(new HttpPhp([
