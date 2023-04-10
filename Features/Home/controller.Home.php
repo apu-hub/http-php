@@ -6,7 +6,7 @@ use App\Response;
 // view controllers
 $index_Home = function (Response $res, Request $req) {
     $templates = [
-        "Home.show",
+        "Home.index",
     ];
 
     $data = ["app_name" => "Http-Php"];

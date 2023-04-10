@@ -145,11 +145,119 @@ class HttpPhp
             if (!is_callable($handler[$i]))
                 throw new \Exception("handler is not callable");
             // execute the handler function
-            $res = $handler[$i]($response, $request);
-            // var_dump($res);
-            if ($res) {
-                exit();
-            }
+            $handler[$i]($response, $request);
+        }
+
+        exit();
+    }
+
+    /**
+     * Post Method
+     */
+    public function post(string $path, callable ...$handler)
+    {
+        // if METHOD and pattern not matched
+        if ($this->getRequestData("method") !== "POST") return $this;
+
+        // path not matched
+        if (!Uri::matchUriAndPath($this->getRequestData("uri"), $path)) return $this;
+
+        // parse param data
+        $fullPath = Uri::cleaner($this->getConfig("previous_path") ?? "/") . "/" . Uri::cleaner($path);
+        $this->params = Uri::parseParamData($this->getRequestData("url"), $fullPath);
+
+        $request = new Request($this->params);
+        $response = new Response();
+
+        // check handler
+        for ($i = 0; $i < count($handler); $i++) {
+            if (!is_callable($handler[$i]))
+                throw new \Exception("handler is not callable");
+            // execute the handler function
+            $handler[$i]($response, $request);
+        }
+
+        exit();
+    }
+
+    /**
+     * Patch Method
+     */
+    public function patch(string $path, callable ...$handler)
+    {
+        // if METHOD and pattern not matched
+        if ($this->getRequestData("method") !== "PATCH") return $this;
+
+        // path not matched
+        if (!Uri::matchUriAndPath($this->getRequestData("uri"), $path)) return $this;
+
+        // parse param data
+        $fullPath = Uri::cleaner($this->getConfig("previous_path") ?? "/") . "/" . Uri::cleaner($path);
+        $this->params = Uri::parseParamData($this->getRequestData("url"), $fullPath);
+
+        $request = new Request($this->params);
+        $response = new Response();
+
+        // check handler
+        for ($i = 0; $i < count($handler); $i++) {
+            if (!is_callable($handler[$i]))
+                throw new \Exception("handler is not callable");
+            // execute the handler function
+            $handler[$i]($response, $request);
+        }
+
+        exit();
+    }
+
+    /**
+     * Delete Method
+     */
+    public function delete(string $path, callable ...$handler)
+    {
+        // if METHOD and pattern not matched
+        if ($this->getRequestData("method") !== "DELETE") return $this;
+
+        // path not matched
+        if (!Uri::matchUriAndPath($this->getRequestData("uri"), $path)) return $this;
+
+        // parse param data
+        $fullPath = Uri::cleaner($this->getConfig("previous_path") ?? "/") . "/" . Uri::cleaner($path);
+        $this->params = Uri::parseParamData($this->getRequestData("url"), $fullPath);
+
+        $request = new Request($this->params);
+        $response = new Response();
+
+        // check handler
+        for ($i = 0; $i < count($handler); $i++) {
+            if (!is_callable($handler[$i]))
+                throw new \Exception("handler is not callable");
+            // execute the handler function
+            $handler[$i]($response, $request);
+        }
+
+        exit();
+    }
+
+    /**
+     * Any Method
+     */
+    public function any(string $path, callable ...$handler)
+    {
+        if (!Uri::matchUriAndPath($this->getRequestData("uri"), $path)) return $this;
+
+        // parse param data
+        $fullPath = Uri::cleaner($this->getConfig("previous_path") ?? "/") . "/" . Uri::cleaner($path);
+        $this->params = Uri::parseParamData($this->getRequestData("url"), $fullPath);
+
+        $request = new Request($this->params);
+        $response = new Response();
+
+        // check handler
+        for ($i = 0; $i < count($handler); $i++) {
+            if (!is_callable($handler[$i]))
+                throw new \Exception("handler is not callable");
+            // execute the handler function
+            $handler[$i]($response, $request);
         }
 
         exit();

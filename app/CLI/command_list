@@ -1,0 +1,7 @@
+It's a simple command line tool design for HTTP-PHP
+
+
+These are common commands
+
+serve                   Start development server
+create:feature <name>   Create new feature

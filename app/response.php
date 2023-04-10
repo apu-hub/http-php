@@ -39,6 +39,7 @@ class Response
         extract($data);
         foreach ($templates as $key => $view_path) {
             $temp = explode(".", $view_path);
+            // .view.Gallery.php
             $file_name = $temp[1] . ".view." . $temp[0] . ".php";
             $file_path = join(DIRECTORY_SEPARATOR, [$feature_page, $temp[0], $file_name]);
             // get absulute path

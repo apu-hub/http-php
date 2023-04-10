@@ -1,4 +1,5 @@
 <?php
+
 namespace App;
 
 class Session
@@ -37,7 +38,7 @@ class Session
         return false;
     }
 
-    public function get(string $key, $default = "")
+    public function runtime(string $key, $default = "")
     {
         $value = trim($this->session_data[$key] ?? "");
         if ($value != "") {
@@ -53,6 +54,21 @@ class Session
         return $default;
     }
 
+    public function get(string $key, $default = "")
+    {
+        $value = trim($this->session_data[$key] ?? "");
+        if ($value != "") {
+            return $value;
+        }
+
+        $value = trim($this->session_data[$this->prefix][$key] ?? "");
+        if ($value != "") {
+            return $value;
+        }
+
+        return $default;
+    }
+
     public function with(string $key, $value)
     {
         // clean all
@@ -60,5 +76,16 @@ class Session
 
         // set new group
         $_SESSION[$this->prefix][$key] = $value;
+    }
+
+    public function set(string $key, $value)
+    {
+        // set new group
+        $_SESSION[$this->prefix][$key] = $value;
+    }
+    
+    public function destroy()
+    {
+        unset($_SESSION[$this->prefix]);
     }
 }
