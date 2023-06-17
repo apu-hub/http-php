@@ -90,7 +90,7 @@ class CommandLineHelper
     }
     function start_php_server()
     {
-        exec("php -S localhost:8000 -t public/");
+        exec("php -S localhost:8000");
     }
     function print_commands()
     {

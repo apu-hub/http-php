@@ -51,8 +51,9 @@ class DB
         }
 
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
     }
-    public function select(string|array $column)
+    public function select(string|array $column = "*")
     {
         $this->table_operation = "select";
 
@@ -211,6 +212,66 @@ class DB
     function query_builder()
     {
     }
+    /**
+     * Get Return Array
+     */
+    function get()
+    {
+        if ($this->table_operation != 'select')
+            throw new Exception("Invalid Table Operation");
+
+        return $this->run() ?? [];
+    }
+
+    function first()
+    {
+        if ($this->table_operation != 'select')
+            throw new Exception("Invalid Table Operation");
+
+        $temp = $this->run();
+
+        if (!$temp)
+            return false;
+
+        if (count($temp) < 1)
+            return false;
+
+        return $temp[0];
+    }
+
+    function last()
+    {
+        if ($this->table_operation != 'select')
+            throw new Exception("Invalid Table Operation");
+
+        $temp = $this->run();
+
+        if (!$temp)
+            return false;
+
+        if (count($temp) < 1)
+            return false;
+
+        return $temp[count($temp) - 1];
+    }
+
+    public function count(string $column = "*")
+    {
+        $this->table_column = " COUNT( ";
+
+        if ($column != "")
+            $this->table_column .= $column;
+
+        $this->table_column .= " ) AS total";
+
+        $data = $this->run();
+
+        if (!count($data))
+            return 0;
+
+        return $data[0]['total'] ?? 0;
+    }
+    
     public function run()
     {
         // echo $this->table_operation;

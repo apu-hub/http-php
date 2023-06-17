@@ -93,7 +93,7 @@ class Uri
                 if (preg_match_all("/^:/", $pathArray[$i])) {
                     // remove ':'
                     $param_key = ltrim($pathArray[$i], ":");
-                    $data[$param_key] = $uriArray[$i];
+                    $data[$param_key] = urldecode($uriArray[$i]);
                 }
             }
         }

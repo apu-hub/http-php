@@ -34,7 +34,7 @@ class Response
     function view(array $templates, array $data = [])
     {
         $app_root = dirname(__FILE__);
-        $feature_page = join(DIRECTORY_SEPARATOR, [dirname($app_root), "Features"]);
+        $feature_page = join(DIRECTORY_SEPARATOR, [dirname($app_root), "features"]);
 
         extract($data);
         foreach ($templates as $key => $view_path) {

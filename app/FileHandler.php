@@ -45,7 +45,7 @@ class FileHandler
         $file_path = join(DIRECTORY_SEPARATOR, [$this->app_path, $src]);
 
         if (!is_file($file_path) || !file_exists($file_path)) {
-            echo "File Not Found";
+            // echo "File Not Found";
             return false;
         }
 
