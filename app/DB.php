@@ -30,7 +30,17 @@ class DB
         return $qb;
     }
 
-    public static function query(string $sql, $data = [])
+    /**
+     * Query
+     * @param string $sql SQL statement
+     * 
+     * @param array $data query data
+     * 
+     * @param boolean $single return fetch or fetchAll
+     * 
+     * @return array
+     */
+    public static function query(string $sql, $data = [], $single = false)
     {
         // get Database info from ENV
         $DB_HOST = $_ENV["DB_HOST"] ?? "";
@@ -50,9 +60,19 @@ class DB
             throw new Exception("Could not connect to the database $DB_DATABASE :" . $pe->getMessage());
         }
 
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($single)
+            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+        else
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $data;
     }
+
+    /**
+     * Select
+     * @param string|array $column columns name
+     * 
+     * @return self
+     */
     public function select(string|array $column = "*")
     {
         $this->table_operation = "select";
@@ -77,12 +97,24 @@ class DB
         return $this;
     }
 
+    /**
+     * Delete
+     * 
+     * @return boolean true or false
+     */
     public function delete()
     {
         $this->table_operation = "delete";
-        return $this;
+        return $this->run();
     }
 
+    /**
+     * Update
+     * 
+     * @param string|array $column column and value
+     * 
+     * @return boolean true or false
+     */
     public function update(string|array $column)
     {
         $this->table_operation = "update";
@@ -90,26 +122,37 @@ class DB
         // if string
         if (!is_array($column)) {
             $this->table_column = $column;
-            return $this;
+            return $this->run();
         }
 
         // if array
         $column_string = "";
         $i = 0;
+        $temp = [];
         foreach ($column as $key => $value) {
             if ($i != 0)
                 $column_string .= ", ";
 
             $column_string .= "`" . $key . "` = ?";
             $i++;
-            array_push($this->table_query_data, $value);
+            $temp[] = $value;
         }
+        $this->table_query_data = array_merge($temp, $this->table_query_data);
+
+        // add updated time stamp
+        $column_string .= ", `updated_at` = now() ";
 
         $this->table_column = $column_string;
 
-        return $this;
+        return $this->run();
     }
 
+    /**
+     * Insert
+     * @param string|array $column column and value
+     * 
+     * @return int insert id
+     */
     public function insert(string|array $column)
     {
         $this->table_operation = "insert";
@@ -117,13 +160,14 @@ class DB
         // if string
         if (!is_array($column)) {
             $this->table_column = $column;
-            return $this;
+            return $this->run();
         }
 
         // if array
         $column_string = "";
         $column_query = "";
         $i = 0;
+        $temp = [];
         foreach ($column as $key => $value) {
             if ($i != 0) {
                 $column_string .= ", ";
@@ -133,26 +177,34 @@ class DB
             $column_string .= " `" . $key . "`";
             $column_query .= " ?";
             $i++;
-            array_push($this->table_query_data, $value);
+            $temp[] = $value;
         }
+        $this->table_query_data = array_merge($temp, $this->table_query_data);
+
+        // add created time stamp
+        $column_string .= ", `created_at` ";
+        $column_query .= ", now() ";
 
         $this->table_column = $column_string;
         $this->table_query = $column_query;
 
-        return $this;
+        return $this->run();
     }
 
     /**
      * Where
-     * @param string column table column name
+     * @param string $column table column name
      * 
-     * @param string|int value column value
+     * @param string|int $value column value
      * 
-     * @param string oparator where operation
+     * @param string $operator where operation
      *  =, !=, >, <, >=, <=
      */
     public function where(string $column, $value, $operator = "=")
     {
+        if (trim($this->table_where) != "")
+            $this->table_where .= " AND ";
+
         $this->table_where .= " `" . $column . "` " . $operator . " ?";
         array_push($this->table_query_data, $value);
 
@@ -209,9 +261,6 @@ class DB
         return $this;
     }
 
-    function query_builder()
-    {
-    }
     /**
      * Get Return Array
      */
@@ -223,6 +272,11 @@ class DB
         return $this->run() ?? [];
     }
 
+    /**
+     * First row
+     * 
+     * @return boolean|array false if not found | data array on success
+     */
     function first()
     {
         if ($this->table_operation != 'select')
@@ -239,6 +293,11 @@ class DB
         return $temp[0];
     }
 
+    /**
+     * Last row
+     * 
+     * @return boolean|array false if not found | data array on success
+     */
     function last()
     {
         if ($this->table_operation != 'select')
@@ -255,6 +314,11 @@ class DB
         return $temp[count($temp) - 1];
     }
 
+    /**
+     * Count of row
+     * 
+     * @return int number of match the query
+     */
     public function count(string $column = "*")
     {
         $this->table_column = " COUNT( ";
@@ -271,7 +335,7 @@ class DB
 
         return $data[0]['total'] ?? 0;
     }
-    
+
     public function run()
     {
         // echo $this->table_operation;
@@ -326,11 +390,29 @@ class DB
             $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $stmt = $db->prepare($sql);
             $stmt->execute($this->table_query_data);
+
+            switch ($this->table_operation) {
+                case 'select':
+                    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    break;
+
+                case 'delete':
+                    $data = $stmt->rowCount() ? true : false;
+                    break;
+
+                case 'update':
+                    $data = $stmt->rowCount() ? true : false;
+                    break;
+
+                case 'insert':
+                    $data = $db->lastInsertId();
+                    break;
+                default:
+                    throw new Exception("Invalid Table Operation");
+            }
         } catch (PDOException $pe) {
             throw new Exception($pe->getMessage());
         }
-
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return $data;
     }
