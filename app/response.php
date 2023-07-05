@@ -1,11 +1,19 @@
 <?php
+
 namespace App;
+
 use App\Session;
 
 class Response
 {
     protected string $redirect_url = "";
     protected Session $session;
+
+    function __construct()
+    {
+        $this->session = new Session("request");
+        $this->redirect_url = $_SERVER['HTTP_REFERER'] ?? "";
+    }
     function send(string $message)
     {
         echo $message;
@@ -36,7 +44,14 @@ class Response
         $app_root = dirname(__FILE__);
         $feature_page = join(DIRECTORY_SEPARATOR, [dirname($app_root), "features"]);
 
-        extract($data);
+        $server_data = [];
+        // generate csrf
+        $csrf_token = bin2hex(random_bytes(32));
+        $this->session->with('csrf_token', $csrf_token);
+        $server_data['csrf'] = "<input type='hidden' name='csrf_token' value='$csrf_token'>";
+        $server_data['csrf_token'] = $csrf_token;
+
+        extract(array_merge($data, $server_data));
         foreach ($templates as $key => $view_path) {
             $temp = explode(".", $view_path);
             // .view.Gallery.php
@@ -54,23 +69,36 @@ class Response
         return $this;
     }
 
+    public function return()
+    {
+        Utils::phpRedirect($this->redirect_url);
+    }
+
     public function back()
     {
-        $this->redirect_url = $_SERVER['HTTP_REFERER'] ?? "";
-        $this->session = new Session("back");
         return $this;
     }
 
     public function redirect(string $url)
     {
         $this->redirect_url = $url;
-        $this->session = new Session("redirect");
         return $this;
     }
 
-    public function with(string $key, $value)
+    public function with($key, $value = "")
     {
-        $this->session->with($key, $value);
+        if (!is_array($key)) {
+            $this->session->with($key, $value);
+        } else {
+            foreach ($key as $index => $data) {
+                $this->session->with($index, $data);
+            }
+        }
         Utils::phpRedirect($this->redirect_url);
+    }
+
+    public function startSession(string $prefix)
+    {
+        return new Session($prefix);
     }
 }

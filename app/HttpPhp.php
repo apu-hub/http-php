@@ -5,6 +5,7 @@ namespace App;
 use App\Request;
 use App\Response;
 use App\Uri;
+use Exception;
 
 class HttpPhp
 {
@@ -125,7 +126,7 @@ class HttpPhp
     /**
      * Get Method
      */
-    public function get(string $path, callable ...$handler)
+    public function get(string $path, array|callable ...$handler)
     {
         // if METHOD and pattern not matched
         if ($this->getRequestData("method") !== "GET") return $this;
@@ -142,10 +143,24 @@ class HttpPhp
 
         // check handler
         for ($i = 0; $i < count($handler); $i++) {
-            if (!is_callable($handler[$i]))
-                throw new \Exception("handler is not callable");
-            // execute the handler function
-            $handler[$i]($response, $request);
+            // if function
+            if (is_callable($handler[$i])) {
+                // execute the handler function
+                $handler[$i]($response, $request);
+            } else {
+                $class_name = $handler[$i][0];
+                $method_name = $handler[$i][1];
+
+                if (!class_exists($class_name))
+                    throw new Exception("The class $class_name does not exist.");
+
+
+                // execute the handler class function
+                if (!method_exists($class_name, $method_name))
+                    throw new Exception("The class $class_name doesn't have method \"$method_name\".");
+
+                call_user_func(array(new $class_name(), $method_name), $response, $request);
+            }
         }
 
         exit();
@@ -154,7 +169,7 @@ class HttpPhp
     /**
      * Post Method
      */
-    public function post(string $path, callable ...$handler)
+    public function post(string $path, array|callable ...$handler)
     {
         // if METHOD and pattern not matched
         if ($this->getRequestData("method") !== "POST") return $this;
@@ -171,10 +186,24 @@ class HttpPhp
 
         // check handler
         for ($i = 0; $i < count($handler); $i++) {
-            if (!is_callable($handler[$i]))
-                throw new \Exception("handler is not callable");
-            // execute the handler function
-            $handler[$i]($response, $request);
+            // if function
+            if (is_callable($handler[$i])) {
+                // execute the handler function
+                $handler[$i]($response, $request);
+            } else {
+                $class_name = $handler[$i][0];
+                $method_name = $handler[$i][1];
+
+                if (!class_exists($class_name))
+                    throw new Exception("The class $class_name does not exist.");
+
+
+                // execute the handler class function
+                if (!method_exists($class_name, $method_name))
+                    throw new Exception("The class $class_name doesn't have method \"$method_name\".");
+
+                call_user_func(array(new $class_name(), $method_name), $response, $request);
+            }
         }
 
         exit();
@@ -183,7 +212,7 @@ class HttpPhp
     /**
      * Patch Method
      */
-    public function patch(string $path, callable ...$handler)
+    public function patch(string $path, array|callable ...$handler)
     {
         // if METHOD and pattern not matched
         if ($this->getRequestData("method") !== "PATCH") return $this;
@@ -200,10 +229,24 @@ class HttpPhp
 
         // check handler
         for ($i = 0; $i < count($handler); $i++) {
-            if (!is_callable($handler[$i]))
-                throw new \Exception("handler is not callable");
-            // execute the handler function
-            $handler[$i]($response, $request);
+            // if function
+            if (is_callable($handler[$i])) {
+                // execute the handler function
+                $handler[$i]($response, $request);
+            } else {
+                $class_name = $handler[$i][0];
+                $method_name = $handler[$i][1];
+
+                if (!class_exists($class_name))
+                    throw new Exception("The class $class_name does not exist.");
+
+
+                // execute the handler class function
+                if (!method_exists($class_name, $method_name))
+                    throw new Exception("The class $class_name doesn't have method \"$method_name\".");
+
+                call_user_func(array(new $class_name(), $method_name), $response, $request);
+            }
         }
 
         exit();
@@ -212,7 +255,7 @@ class HttpPhp
     /**
      * Delete Method
      */
-    public function delete(string $path, callable ...$handler)
+    public function delete(string $path, array|callable ...$handler)
     {
         // if METHOD and pattern not matched
         if ($this->getRequestData("method") !== "DELETE") return $this;
@@ -229,10 +272,24 @@ class HttpPhp
 
         // check handler
         for ($i = 0; $i < count($handler); $i++) {
-            if (!is_callable($handler[$i]))
-                throw new \Exception("handler is not callable");
-            // execute the handler function
-            $handler[$i]($response, $request);
+            // if function
+            if (is_callable($handler[$i])) {
+                // execute the handler function
+                $handler[$i]($response, $request);
+            } else {
+                $class_name = $handler[$i][0];
+                $method_name = $handler[$i][1];
+
+                if (!class_exists($class_name))
+                    throw new Exception("The class $class_name does not exist.");
+
+
+                // execute the handler class function
+                if (!method_exists($class_name, $method_name))
+                    throw new Exception("The class $class_name doesn't have method \"$method_name\".");
+
+                call_user_func(array(new $class_name(), $method_name), $response, $request);
+            }
         }
 
         exit();
@@ -241,7 +298,7 @@ class HttpPhp
     /**
      * Any Method
      */
-    public function any(string $path, callable ...$handler)
+    public function any(string $path, array|callable ...$handler)
     {
         if (!Uri::matchUriAndPath($this->getRequestData("uri"), $path)) return $this;
 
@@ -254,10 +311,24 @@ class HttpPhp
 
         // check handler
         for ($i = 0; $i < count($handler); $i++) {
-            if (!is_callable($handler[$i]))
-                throw new \Exception("handler is not callable");
-            // execute the handler function
-            $handler[$i]($response, $request);
+            // if function
+            if (is_callable($handler[$i])) {
+                // execute the handler function
+                $handler[$i]($response, $request);
+            } else {
+                $class_name = $handler[$i][0];
+                $method_name = $handler[$i][1];
+
+                if (!class_exists($class_name))
+                    throw new Exception("The class $class_name does not exist.");
+
+
+                // execute the handler class function
+                if (!method_exists($class_name, $method_name))
+                    throw new Exception("The class $class_name doesn't have method \"$method_name\".");
+
+                call_user_func(array(new $class_name(), $method_name), $response, $request);
+            }
         }
 
         exit();
@@ -266,7 +337,7 @@ class HttpPhp
     /**
      * Group 
      */
-    public function group(string $path, callable ...$handler)
+    public function group(string $path, array|callable ...$handler)
     {
         // add wildcard to group path
         $currentPath = Uri::cleaner($path);
@@ -284,10 +355,24 @@ class HttpPhp
 
         // check handler
         for ($i = 0; $i < count($handler); $i++) {
-            if (!is_callable($handler[$i]))
-                throw new \Exception("handler is not callable");
-            // execute the handler function
-            $handler[$i]($response, $request);
+            // if function
+            if (is_callable($handler[$i])) {
+                // execute the handler function
+                $handler[$i]($response, $request);
+            } else {
+                $class_name = $handler[$i][0];
+                $method_name = $handler[$i][1];
+
+                if (!class_exists($class_name))
+                    throw new Exception("The class $class_name does not exist.");
+
+
+                // execute the handler class function
+                if (!method_exists($class_name, $method_name))
+                    throw new Exception("The class $class_name doesn't have method \"$method_name\".");
+
+                call_user_func(array(new $class_name(), $method_name), $response, $request);
+            }
         }
 
         // remove group path

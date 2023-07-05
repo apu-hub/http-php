@@ -21,15 +21,12 @@ class Session
 
     public function has(string $key)
     {
-        $value = trim($this->session_data[$key] ?? "");
-
-        if ($value != "") {
+        if (isset($this->session_data[$key])) {
             return true;
         }
 
         foreach ($this->session_data as $prefix => $val) {
-            $value = trim($val[$key] ?? "");
-            if ($value != "") {
+            if (isset($val[$key])) {
                 $this->prefix = $prefix;
                 return true;
             }
@@ -40,15 +37,14 @@ class Session
 
     public function runtime(string $key, $default = "")
     {
-        $value = trim($this->session_data[$key] ?? "");
-        if ($value != "") {
-            return $value;
+        if (isset($this->session_data[$key])) {
+            unset($_SESSION[$key]);
+            return $this->session_data[$key];
         }
 
-        $value = trim($this->session_data[$this->prefix][$key] ?? "");
-        if ($value != "") {
-            unset($_SESSION[$this->prefix]);
-            return $value;
+        if (isset($this->session_data[$this->prefix][$key])) {
+            unset($_SESSION[$this->prefix][$key]);
+            return $this->session_data[$this->prefix][$key];
         }
 
         return $default;
@@ -56,14 +52,12 @@ class Session
 
     public function get(string $key, $default = "")
     {
-        $value = trim($this->session_data[$key] ?? "");
-        if ($value != "") {
-            return $value;
+        if (isset($this->session_data[$key])) {
+            return $this->session_data[$key];
         }
 
-        $value = trim($this->session_data[$this->prefix][$key] ?? "");
-        if ($value != "") {
-            return $value;
+        if (isset($this->session_data[$this->prefix][$key])) {
+            return $this->session_data[$this->prefix][$key];
         }
 
         return $default;
@@ -83,7 +77,6 @@ class Session
         // set new group
         $_SESSION[$this->prefix][$key] = $value;
     }
-    
     public function destroy()
     {
         unset($_SESSION[$this->prefix]);

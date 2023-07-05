@@ -8,6 +8,7 @@ class Request
     private $query_data = [];
     private $params_data = [];
     private $headers_data = [];
+    public Session $session;
 
     function __construct(array $params_data)
     {
@@ -17,6 +18,7 @@ class Request
         $temp_body = json_decode(file_get_contents('php://input'), true);
         $this->body_data = $temp_body ? $temp_body : [];
         $this->headers_data = getallheaders();
+        $this->session = new Session('request');
     }
 
     function getallheaders()
@@ -33,6 +35,11 @@ class Request
         }
 
         return $headers;
+    }
+
+    public function getSession(string $prefix = "")
+    {
+        return new Session($prefix);
     }
 
     function clean_input($input)
@@ -58,6 +65,12 @@ class Request
     {
         // if key not set and empty return all query data
         if (!isset($key) || empty($key)) {
+            foreach ($_FILES as $key => $file) {
+                if (trim($file['name'] ?? "") == "")
+                    continue;
+
+                $this->query_data = array_merge($this->query_data, [$key => $file['name']]);
+            }
             return $this->query_data;
         }
 
@@ -94,5 +107,26 @@ class Request
         }
 
         return $default;
+    }
+
+    function check_csrf()
+    {
+        $csrf_token_session = $this->session->get('csrf_token');
+        $csrf_token_request = $this->query('csrf_token');
+
+        if (trim($csrf_token_request) == "")
+            $csrf_token_request = $this->headers('x-csrf-token');
+
+        if (trim($csrf_token_request) == "") {
+            http_response_code(403);
+            echo "csrf token missing";
+            exit();
+        }
+
+        if (trim($csrf_token_request) != $csrf_token_session) {
+            http_response_code(403);
+            echo "invalid csrf token";
+            exit();
+        }
     }
 }

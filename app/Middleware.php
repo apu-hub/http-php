@@ -13,7 +13,7 @@ class Middleware
         header('Access-Control-Allow-Methods: PATCH, PUT, GET, POST, DELETE, OPTIONS');
 
         // Additional headers which may be sent along with the CORS request
-        header('Access-Control-Allow-Headers: withCredentials,x-api-key,X-Requested-With,Authorization,Content-Type');
+        header('Access-Control-Allow-Headers: withCredentials,x-api-key,X-Requested-With,Authorization,Content-Type,X-CSRF-Token');
 
         // Set the age to 1 day to improve speed/caching.
         header('Access-Control-Max-Age: 86400');
